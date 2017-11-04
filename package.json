@@ -1,0 +1,19 @@
+{
+  "name": "gitpirates_server",
+  "version": "1.0.0",
+  "description": "WebSocket Server for GitPirates",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rushpuppych/GitPirates_Server.git"
+  },
+  "author": "Severin Holm <info@severin-holm.ch>",
+  "bugs": {
+    "url": "https://github.com/rushpuppych/GitPirates_Server/issues"
+  },
+  "homepage": "https://github.com/rushpuppych/GitPirates_Server#readme",
+  "dependencies": {
+    "express": "^4.16.2",
+    "socket.io": "^2.0.4"
+  }
+}
