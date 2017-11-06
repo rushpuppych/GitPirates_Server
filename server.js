@@ -4,6 +4,16 @@ var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
+var bodyParser = require('body-parser');
+
+// Config Server
+var $this = this;
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+
+// Game Management
+var objGames = [];
+var objSockets = [];
 
 /**
  * WebSite Routing
@@ -16,12 +26,13 @@ app.get('/lobby', function(req, res){
   res.send('{WAITING_FOR_JOINS}');
 });
 
-app.get('/board', function(req, res){
-  res.send('{SCORE_BOARD}');
-});
-
 app.post('/create', function(req, res){
-  res.send('{CREATING OWN GAME}');
+  var objGame = JSON.parse(req.body);
+  $this.objGames.push(objGame);
+
+  // TODO: Add Chanell to All Sockets
+
+  res.send('Created');
 });
 
 
@@ -29,6 +40,7 @@ app.post('/create', function(req, res){
  * WebSocket Handling
  */
  io.on('connection', function(socket){
+   // TODO: Add To socket Array
    console.log('a user connected');
 
    socket.on('disconnect', function(){
@@ -36,6 +48,7 @@ app.post('/create', function(req, res){
    });
 
    // todo: 12345 is the Chanell ID
+   // todo this is new in Create Post Routine or in externall Function routine
    socket.on('12345', function(msg){
      console.log(msg);
      io.emit('12345', msg);
