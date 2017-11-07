@@ -22,8 +22,15 @@ app.get('/', function(req, res){
 });
 
 app.get('/lobby', function(req, res){
-  console.log(JSON.stringify($this.objGames));
   res.send(JSON.stringify($this.objGames));
+});
+
+app.get('/game/:id', function(req, res){
+  for(var numIndex in $this.objGames) {
+    if($this.objGames[numIndex]['id'] == req.params.id) {
+      res.send(JSON.stringify($this.objGames[numIndex]));
+    }
+  }
 });
 
 app.post('/create', function(req, res){
@@ -69,7 +76,8 @@ app.post('/create', function(req, res){
        // Add Player to Game
        for(var numGameIndex in $this.objGames) {
          if($this.objGames[numGameIndex]['id'] == socket.mission_id) {
-           $this.objGames[numGameIndex]['connected'].push({id: socket.player_id});
+           $this.objGames[numGameIndex]['connected'].push({id: socket.player_id, player: objMsg.player});
+           io.emit(socket.mission_id, {type: 'player_connected'});
          }
        }
        console.log("Connected: " + socket.player_id);
