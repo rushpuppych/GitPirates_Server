@@ -12,8 +12,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 // Game Management
-var objGames = [];
-var objSockets = [];
+this.objGames = [];
 
 /**
  * WebSite Routing
@@ -23,15 +22,13 @@ app.get('/', function(req, res){
 });
 
 app.get('/lobby', function(req, res){
-  res.send('{WAITING_FOR_JOINS}');
+  console.log(JSON.stringify($this.objGames));
+  res.send(JSON.stringify($this.objGames));
 });
 
 app.post('/create', function(req, res){
-  var objGame = JSON.parse(req.body);
-  $this.objGames.push(objGame);
-
-  // TODO: Add Chanell to All Sockets
-
+  var numMapId = req.body.id
+  $this.objGames.push(req.body);
   res.send('Created');
 });
 
@@ -40,18 +37,44 @@ app.post('/create', function(req, res){
  * WebSocket Handling
  */
  io.on('connection', function(socket){
-   // TODO: Add To socket Array
-   console.log('a user connected');
+   // Player Connect
+   socket.emit('connect', {});
 
+   // Player Disconnected
    socket.on('disconnect', function(){
-     console.log('user disconnected');
+     // Delete Player from Game
+     for(var numGameIndex in $this.objGames) {
+       if($this.objGames[numGameIndex]['id'] == socket.mission_id) {
+         for(var numIndex in $this.objGames[numGameIndex]['connected']) {
+           if($this.objGames[numGameIndex]['connected'][numIndex]['id'] == socket.player_id) {
+             delete $this.objGames[numGameIndex]['connected'][numIndex];
+           }
+         }
+       }
+     }
+     console.log("Disconnected: " + socket.player_id);
    });
 
-   // todo: 12345 is the Chanell ID
-   // todo this is new in Create Post Routine or in externall Function routine
-   socket.on('12345', function(msg){
-     console.log(msg);
-     io.emit('12345', msg);
+   // Player Server Event
+   socket.on('server', function(objMsg){
+     if(objMsg.type == 'connect') {
+       socket.player_id = objMsg.player_id;
+       socket.mission_id = objMsg.mission_id;
+
+       // Mission Broadcasting
+       socket.on(socket.mission_id, function(objMsg){
+         io.emit(socket.mission_id, objMsg);
+       });
+
+       // Add Player to Game
+       for(var numGameIndex in $this.objGames) {
+         if($this.objGames[numGameIndex]['id'] == socket.mission_id) {
+           $this.objGames[numGameIndex]['connected'].push({id: socket.player_id});
+         }
+       }
+       console.log("Connected: " + socket.player_id);
+     }
+
    });
  });
 
