@@ -14,6 +14,17 @@ app.use(bodyParser.urlencoded({extended: true}));
 // Game Management
 this.objGames = [];
 
+// Remove Array Node HELPER
+this.removeArrayNode = function(array, strKeyIndex) {
+  var arrNew = [];
+  for(var numIndex in array) {
+    if(numIndex != strKeyIndex) {
+      arrNew.push(array[numIndex])
+    }
+  }
+  return arrNew;
+};
+
 /**
  * WebSite Routing
  */
@@ -54,7 +65,12 @@ app.post('/create', function(req, res){
        if($this.objGames[numGameIndex]['id'] == socket.mission_id) {
          for(var numIndex in $this.objGames[numGameIndex]['connected']) {
            if($this.objGames[numGameIndex]['connected'][numIndex]['id'] == socket.player_id) {
-             delete $this.objGames[numGameIndex]['connected'][numIndex];
+             $this.objGames[numGameIndex]['connected'] = $this.removeArrayNode($this.objGames[numGameIndex]['connected'], numIndex);
+
+             // Delete Game if it is Last Player
+             if($this.objGames[numGameIndex]['connected'].length == 0) {
+               $this.objGames = $this.removeArrayNode($this.objGames, numGameIndex);
+             }
            }
          }
        }
