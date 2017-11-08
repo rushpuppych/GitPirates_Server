@@ -64,6 +64,7 @@ app.post('/create', function(req, res){
      for(var numGameIndex in $this.objGames) {
        if($this.objGames[numGameIndex]['id'] == socket.mission_id) {
          for(var numIndex in $this.objGames[numGameIndex]['connected']) {
+           // todo: sometimes ID is undefined and then it throws an error :-(
            if($this.objGames[numGameIndex]['connected'][numIndex]['id'] == socket.player_id) {
              $this.objGames[numGameIndex]['connected'] = $this.removeArrayNode($this.objGames[numGameIndex]['connected'], numIndex);
 
