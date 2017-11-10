@@ -61,21 +61,25 @@ app.post('/create', function(req, res){
    // Player Disconnected
    socket.on('disconnect', function(){
      // Delete Player from Game
-     for(var numGameIndex in $this.objGames) {
-       if($this.objGames[numGameIndex]['id'] == socket.mission_id) {
-         for(var numIndex in $this.objGames[numGameIndex]['connected']) {
-           // todo: sometimes ID is undefined and then it throws an error :-(
-           if($this.objGames[numGameIndex]['connected'][numIndex]['id'] == socket.player_id) {
-             $this.objGames[numGameIndex]['connected'] = $this.removeArrayNode($this.objGames[numGameIndex]['connected'], numIndex);
+    for(var numGameIndex in $this.objGames) {
+      if($this.objGames[numGameIndex]['id'] == socket.mission_id) {
+        for(var numIndex in $this.objGames[numGameIndex]['connected']) {
+          if(typeof($this.objGames[numGameIndex]) != 'undefined') {
+            if(typeof($this.objGames[numGameIndex]['connected'][numIndex]) != 'undefined') {
+              if($this.objGames[numGameIndex]['connected'][numIndex]['id'] == socket.player_id) {
+                // Delete Player From Array
+                $this.objGames[numGameIndex]['connected'] = $this.removeArrayNode($this.objGames[numGameIndex]['connected'], numIndex);
 
-             // Delete Game if it is Last Player
-             if($this.objGames[numGameIndex]['connected'].length == 0) {
-               $this.objGames = $this.removeArrayNode($this.objGames, numGameIndex);
-             }
-           }
-         }
-       }
-     }
+                // Delete Game if it is Last Player
+                if($this.objGames[numGameIndex]['connected'].length == 0) {
+                  $this.objGames = $this.removeArrayNode($this.objGames, numGameIndex);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
      console.log("Disconnected: " + socket.player_id);
    });
 
@@ -87,6 +91,7 @@ app.post('/create', function(req, res){
 
        // Mission Broadcasting
        socket.on(socket.mission_id, function(objMsg){
+         console.log(objMsg);
          io.emit(socket.mission_id, objMsg);
        });
 
